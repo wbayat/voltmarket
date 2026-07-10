@@ -45,4 +45,5 @@ Server runs at `http://localhost:5000` by default.
 
 ### 5. Insert dummy values in the tables
 
-Use `npx prisma studio` to insert values in your local database for testing purposes
+Run `node prisma/seed.js` to add dummy values into the db for testing.
+Or use `npx prisma studio`.
