@@ -113,3 +113,35 @@ curl http://localhost:5000/api/vehicles/9999
 ```bash
 curl http://localhost:5000/api/vehicles/hot-deals
 ```
+
+# Review
+
+## Create a review (You have to be logged in)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/reviews \
+  -H "Content-Type: application/json" \
+  -d '{"vehicleId": 17, "rating": 5, "comment": "Really happy with this one."}'
+```
+
+## Leave a review for the same car with the same account (fails)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/reviews \
+  -H "Content-Type: application/json" \
+  -d '{"vehicleId": 17, "rating": 5, "comment": "review for the same car."}'
+```
+
+## Invalid rating
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/reviews \
+  -H "Content-Type: application/json" \
+  -d '{"vehicleId": 2, "rating": 9}'
+```
+
+## Get all reviews for a vehicle
+
+```bash
+curl http://localhost:5000/api/reviews/vehicle/17
+```
