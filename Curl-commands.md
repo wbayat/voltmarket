@@ -145,3 +145,41 @@ curl -b cookies.txt -X POST http://localhost:5000/api/reviews \
 ```bash
 curl http://localhost:5000/api/reviews/vehicle/17
 ```
+
+# Wishlist
+
+## Add a vehicle to wishlist
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/wishlist \ -H "Content-Type: application/json" \ -d '{"vehicleId": 17}'
+```
+
+## Try adding the same vehicle again (should fail)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/wishlist \ -H "Content-Type: application/json" \ -d '{"vehicleId": 17}'
+```
+
+## Get the wishlist
+
+```bash
+curl -b cookies.txt http://localhost:5000/api/wishlist
+```
+
+## Remove a vehicle from wishlist
+
+```bash
+curl -b cookies.txt -X DELETE http://localhost:5000/api/wishlist/17
+```
+
+## Try removing something not in the wishlist (should fail)
+
+```bash
+curl -b cookies.txt -X DELETE http://localhost:5000/api/wishlist/323
+```
+
+## Try without being logged in (should fail)
+
+```bash
+curl -X GET http://localhost:5000/api/wishlist
+```
