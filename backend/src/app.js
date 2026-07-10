@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import vehicleRoutes from "./routes/vehicle.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use(cookieParser());
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 export default app;
