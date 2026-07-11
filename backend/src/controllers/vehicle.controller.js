@@ -3,25 +3,23 @@ import prisma from "../utils/prismaClient.js";
 export const getVehicles = async (req, res) => {
   try {
     // These fields are used to filter vehicles
-    const { brand, color, minPrice, maxPrice, sortBy, order } = req.query;
-
+    const { brand, color, condition, minPrice, maxPrice, sortBy, order } =
+      req.query;
     const where = { isActive: true };
     if (brand) where.brand = brand;
     if (color) where.color = color;
+    if (condition) where.condition = condition; // "NEW" or "USED"
     if (minPrice || maxPrice) {
       where.price = {};
       if (minPrice) where.price.gte = parseFloat(minPrice);
       if (maxPrice) where.price.lte = parseFloat(maxPrice);
     }
-
     // Vehicles can be sorted using these three options
     const allowedSortFields = ["price", "year", "range"];
     const orderBy = allowedSortFields.includes(sortBy)
       ? { [sortBy]: order === "desc" ? "desc" : "asc" } // default to desc order
       : { createdAt: "desc" };
-
     const vehicles = await prisma.vehicle.findMany({ where, orderBy });
-
     res.json(vehicles);
   } catch (error) {
     console.error(error);
@@ -33,17 +31,15 @@ export const getVehicles = async (req, res) => {
 export const getVehicleById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const vehicle = await prisma.vehicle.findUnique({
       where: { id: parseInt(id) },
+      include: { historyRecords: true }, // shows accident/service history for used vehicles
     });
-
     if (!vehicle || !vehicle.isActive) {
       return res
         .status(404)
         .json({ message: `Vehicle with id = ${id} doesn't exist!` });
     }
-
     res.json(vehicle);
   } catch (error) {
     console.error(error);
@@ -63,7 +59,6 @@ export const getHotDeals = async (req, res) => {
       },
       orderBy: { price: "asc" },
     });
-
     res.json(vehicles);
   } catch (error) {
     console.error(error);

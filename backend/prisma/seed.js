@@ -10,6 +10,8 @@ async function main() {
   console.log("Adding dummy values to the database...");
 
   // cleanup before adding new values
+  // vehicleHistoryRecord must be cleared before vehicle, since it references it
+  await prisma.vehicleHistoryRecord.deleteMany();
   await prisma.review.deleteMany();
   await prisma.wishlistItem.deleteMany();
   await prisma.orderItem.deleteMany();
@@ -52,6 +54,7 @@ async function main() {
   console.log("Created users");
 
   // Vehicles
+  // condition defaults to NEW in the schema, but it's listed explicitly below for clarity
   const vehicleData = [
     {
       brand: "Tesla",
@@ -64,6 +67,7 @@ async function main() {
       imageUrls: [],
       description: "An electric sedan.",
       isHotDeal: true,
+      condition: "NEW",
     },
     {
       brand: "Tesla",
@@ -76,6 +80,7 @@ async function main() {
       imageUrls: [],
       description: "SUV vehicle.",
       isHotDeal: false,
+      condition: "NEW",
     },
     {
       brand: "Ford",
@@ -88,6 +93,7 @@ async function main() {
       imageUrls: [],
       description: "An electric SUV.",
       isHotDeal: true,
+      condition: "NEW",
     },
     {
       brand: "Chevrolet",
@@ -100,6 +106,7 @@ async function main() {
       imageUrls: [],
       description: "An electric car.",
       isHotDeal: false,
+      condition: "NEW",
     },
     {
       brand: "Hyundai",
@@ -112,6 +119,7 @@ async function main() {
       imageUrls: [],
       description: "An electric car.",
       isHotDeal: false,
+      condition: "NEW",
     },
     {
       brand: "Kia",
@@ -124,6 +132,7 @@ async function main() {
       imageUrls: [],
       description: "An electric car.",
       isHotDeal: true,
+      condition: "NEW",
     },
     {
       brand: "Nissan",
@@ -136,6 +145,7 @@ async function main() {
       imageUrls: [],
       description: "An electric car.",
       isHotDeal: false,
+      condition: "NEW",
     },
     {
       brand: "BMW",
@@ -148,6 +158,36 @@ async function main() {
       imageUrls: [],
       description: "An electric car.",
       isHotDeal: false,
+      condition: "NEW",
+    },
+    // used vehicles, with mileage and history records added further down
+    {
+      brand: "Tesla",
+      model: "Model S",
+      year: 2020,
+      price: 34000,
+      range: 370,
+      color: "Blue",
+      quantity: 2,
+      imageUrls: [],
+      description: "A well-maintained used Model S.",
+      isHotDeal: false,
+      condition: "USED",
+      mileage: 42000,
+    },
+    {
+      brand: "Nissan",
+      model: "Leaf",
+      year: 2019,
+      price: 15000,
+      range: 130,
+      color: "White",
+      quantity: 3,
+      imageUrls: [],
+      description: "A budget-friendly used Leaf.",
+      isHotDeal: false,
+      condition: "USED",
+      mileage: 58000,
     },
   ];
 
@@ -158,6 +198,48 @@ async function main() {
   }
 
   console.log(`Created ${vehicles.length} vehicles`);
+
+  // Vehicle history records for the used vehicles
+  const usedModelS = vehicles.find(
+    (v) => v.model === "Model S" && v.condition === "USED",
+  );
+  const usedLeaf = vehicles.find(
+    (v) => v.model === "Leaf" && v.condition === "USED",
+  );
+
+  if (usedModelS) {
+    await prisma.vehicleHistoryRecord.createMany({
+      data: [
+        {
+          vehicleId: usedModelS.id,
+          eventType: "accident",
+          description: "Minor rear-end collision, bumper replaced.",
+          eventDate: new Date("2022-03-15"),
+        },
+        {
+          vehicleId: usedModelS.id,
+          eventType: "service",
+          description: "Routine battery health check, passed.",
+          eventDate: new Date("2023-06-01"),
+        },
+      ],
+    });
+  }
+
+  if (usedLeaf) {
+    await prisma.vehicleHistoryRecord.createMany({
+      data: [
+        {
+          vehicleId: usedLeaf.id,
+          eventType: "owner_change",
+          description: "Sold by original owner, single previous owner.",
+          eventDate: new Date("2023-01-10"),
+        },
+      ],
+    });
+  }
+
+  console.log("Created vehicle history records for used vehicles");
 
   // Cart
   const aliceCart = await prisma.cart.create({
