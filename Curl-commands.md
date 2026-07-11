@@ -200,28 +200,12 @@ curl -b cookies.txt -X POST http://localhost:5000/api/cart \
   -d '{"vehicleId": 4, "quantity": 1, "selectedColor": "Blue", "selectedInteriorColor": "Black"}'
 ```
 
-## Add the same vehicle with the same color/interior again (should increase quantity, not duplicate)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 4, "quantity": 1, "selectedColor": "Blue", "selectedInteriorColor": "Black"}'
-```
-
-## Add the same vehicle with a different color (should create a separate cart item)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 4, "quantity": 1, "selectedColor": "White", "selectedInteriorColor": "Gray"}'
-```
-
 ## Try adding more than available stock
 
 ```bash
 curl -b cookies.txt -X POST http://localhost:5000/api/cart \
   -H "Content-Type: application/json" \
-  -d '{"vehicleId": 1, "quantity": 9999, "selectedColor": "White", "selectedInteriorColor": "Black"}'
+  -d '{"vehicleId": 1, "quantity": 9, "selectedColor": "White", "selectedInteriorColor": "Black"}'
 ```
 
 ## Try an invalid color (should fail with 400)
@@ -232,58 +216,10 @@ curl -b cookies.txt -X POST http://localhost:5000/api/cart \
   -d '{"vehicleId": 1, "quantity": 1, "selectedColor": "Purple", "selectedInteriorColor": "Black"}'
 ```
 
-## Try an invalid interior color (should fail with 400)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 1, "quantity": 1, "selectedColor": "White", "selectedInteriorColor": "Gold"}'
-```
-
-## Add a used vehicle (only one valid color/interior option — replace 9 with your used vehicle's id)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 9, "quantity": 1, "selectedColor": "Blue", "selectedInteriorColor": "Black"}'
-```
-
-## Try a used vehicle with a color it doesn't have (should fail with 400)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 9, "quantity": 1, "selectedColor": "Red", "selectedInteriorColor": "Black"}'
-```
-
-## Try missing selectedColor entirely (should fail with 400, zod validation)
-
-```bash
-curl -b cookies.txt -X POST http://localhost:5000/api/cart \
-  -H "Content-Type: application/json" \
-  -d '{"vehicleId": 1, "quantity": 1, "selectedInteriorColor": "Black"}'
-```
-
 ## Get the cart
 
 ```bash
 curl -b cookies.txt http://localhost:5000/api/cart
-```
-
-## Update a cart item's quantity only
-
-```bash
-curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \
-  -H "Content-Type: application/json" \
-  -d '{"quantity": 3}'
-```
-
-## Update a cart item's color only
-
-```bash
-curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \
-  -H "Content-Type: application/json" \
-  -d '{"selectedColor": "Black"}'
 ```
 
 ## Update a cart item's color and interior color together
@@ -294,30 +230,46 @@ curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \
   -d '{"selectedColor": "Red", "selectedInteriorColor": "Black"}'
 ```
 
-## Try updating to an invalid color (should fail with 400)
-
-```bash
-curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \
-  -H "Content-Type: application/json" \
-  -d '{"selectedColor": "Purple"}'
-```
-
-## Try updating with an empty body (should fail with 400, nothing to update)
-
-```bash
-curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
 ## Remove a cart item
 
 ```bash
 curl -b cookies.txt -X DELETE http://localhost:5000/api/cart/1
 ```
 
-## Try getting the cart without being logged in (should fail with 401)
+# Checkout
+
+## Add something to cart first (needed before checkout)
 
 ```bash
-curl http://localhost:5000/api/cart
+curl -b cookies.txt -X POST http://localhost:5000/api/cart \
+  -H "Content-Type: application/json" \
+  -d '{"vehicleId": 5, "quantity": 1, "selectedColor": "Silver", "selectedInteriorColor": "Black"}'
+```
+
+## Checkout with valid fake card details
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/checkout \
+  -H "Content-Type: application/json" \
+  -d '{"cardholderName": "Alice Johnson", "cardNumber": "4111111111111111", "expiryDate": "12/28", "cvv": "123"}'
+```
+
+## Try an invalid card number (should fail with 400)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/checkout \
+  -H "Content-Type: application/json" \
+  -d '{"cardholderName": "Alice Johnson", "cardNumber": "1234", "expiryDate": "12/28", "cvv": "123"}'
+```
+
+## View order history
+
+```bash
+curl -b cookies.txt http://localhost:5000/api/checkout/orders
+```
+
+## View a single order by id
+
+```bash
+curl -b cookies.txt http://localhost:5000/api/checkout/orders/1
 ```
