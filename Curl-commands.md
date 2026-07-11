@@ -183,3 +183,41 @@ curl -b cookies.txt -X DELETE http://localhost:5000/api/wishlist/323
 ```bash
 curl -X GET http://localhost:5000/api/wishlist
 ```
+
+# Cart
+
+## Add a vehicle to cart (Must log in first)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/cart \ -H "Content-Type: application/json" \ -d '{"vehicleId": 4, "quantity": 1}'
+```
+
+## Add the same vehicle again (should increase quantity)
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/cart \ -H "Content-Type: application/json" \ -d '{"vehicleId": 4, "quantity": 1}'
+```
+
+## Try adding more than available stock
+
+```bash
+curl -b cookies.txt -X POST http://localhost:5000/api/cart \ -H "Content-Type: application/json" \ -d '{"vehicleId": 1, "quantity": 9}'
+```
+
+## Get the cart
+
+```bash
+curl -b cookies.txt http://localhost:5000/api/cart
+```
+
+## Update a cart item's quantity
+
+```bash
+curl -b cookies.txt -X PATCH http://localhost:5000/api/cart/1 \ -H "Content-Type: application/json" \ -d '{"quantity": 3}'
+```
+
+## Remove a cart item
+
+```bash
+curl -b cookies.txt -X DELETE http://localhost:5000/api/cart/1
+```
