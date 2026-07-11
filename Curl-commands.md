@@ -72,6 +72,12 @@ curl "http://localhost:5000/api/vehicles?color=Black"
 curl "http://localhost:5000/api/vehicles?minPrice=25000&maxPrice=45000"
 ```
 
+## Filter by condition
+
+```bash
+curl "http://localhost:5000/api/vehicles?condition=USED"
+```
+
 ## Sort by price ascending
 
 ```bash

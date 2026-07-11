@@ -24,25 +24,44 @@ model User {
   createdAt DateTime @default(now())
 }
 
+enum Condition {
+  NEW
+  USED
+}
+
 model Vehicle {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   brand       String
   model       String
   year        Int
   price       Float
   range       Int
   color       String
-  quantity    Int      @default(0)
-  imageUrls   String[] @default([])
+  quantity    Int       @default(0)
+  imageUrls   String[]  @default([])
   description String?
-  isActive    Boolean  @default(true)
-  isHotDeal   Boolean  @default(false)
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  wishlistItems WishlistItem[]
-  reviews       Review[]
+  isActive    Boolean   @default(true)
+  isHotDeal   Boolean   @default(false)
+  condition   Condition @default(NEW)
+  mileage     Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  wishlistItems  WishlistItem[]
+  reviews        Review[]
+  historyRecords VehicleHistoryRecord[]
+}
+
+model VehicleHistoryRecord {
+  id          Int      @id @default(autoincrement())
+  vehicleId   Int
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  eventType   String
+  description String
+  eventDate   DateTime
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model Cart {
