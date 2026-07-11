@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -44,6 +42,10 @@ model Vehicle {
   isHotDeal   Boolean   @default(false)
   condition   Condition @default(NEW)
   mileage     Int?
+
+  availableColors         String[] @default([])
+  availableInteriorColors String[] @default([])
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -79,6 +81,10 @@ model CartItem {
   vehicleId Int
   vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
   quantity  Int      @default(1)
+
+  selectedColor         String?
+  selectedInteriorColor String?
+
   createdAt DateTime @default(now())
 
   @@unique([cartId, vehicleId])
@@ -101,7 +107,10 @@ model OrderItem {
   vehicleId  Int
   vehicle    Vehicle @relation(fields: [vehicleId], references: [id])
   quantity   Int
-  priceAtPurchase Float 
+  priceAtPurchase Float
+
+  selectedColor         String?
+  selectedInteriorColor String?
 }
 
 model WishlistItem {

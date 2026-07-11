@@ -53,8 +53,6 @@ async function main() {
 
   console.log("Created users");
 
-  // Vehicles
-  // condition defaults to NEW in the schema, but it's listed explicitly below for clarity
   const vehicleData = [
     {
       brand: "Tesla",
@@ -68,6 +66,8 @@ async function main() {
       description: "An electric sedan.",
       isHotDeal: true,
       condition: "NEW",
+      availableColors: ["White", "Black", "Red"],
+      availableInteriorColors: ["Black", "White"],
     },
     {
       brand: "Tesla",
@@ -81,6 +81,8 @@ async function main() {
       description: "SUV vehicle.",
       isHotDeal: false,
       condition: "NEW",
+      availableColors: ["Black", "White", "Blue"],
+      availableInteriorColors: ["Black", "White"],
     },
     {
       brand: "Ford",
@@ -94,6 +96,8 @@ async function main() {
       description: "An electric SUV.",
       isHotDeal: true,
       condition: "NEW",
+      availableColors: ["Red", "Black", "Gray"],
+      availableInteriorColors: ["Black"],
     },
     {
       brand: "Chevrolet",
@@ -107,6 +111,8 @@ async function main() {
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
+      availableColors: ["Blue", "White", "Silver"],
+      availableInteriorColors: ["Black", "Gray"],
     },
     {
       brand: "Hyundai",
@@ -120,6 +126,8 @@ async function main() {
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
+      availableColors: ["Silver", "White", "Black"],
+      availableInteriorColors: ["Black", "Beige"],
     },
     {
       brand: "Kia",
@@ -133,6 +141,8 @@ async function main() {
       description: "An electric car.",
       isHotDeal: true,
       condition: "NEW",
+      availableColors: ["Gray", "Red", "White"],
+      availableInteriorColors: ["Black"],
     },
     {
       brand: "Nissan",
@@ -146,6 +156,8 @@ async function main() {
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
+      availableColors: ["Green", "White", "Black"],
+      availableInteriorColors: ["Black", "Gray"],
     },
     {
       brand: "BMW",
@@ -159,8 +171,9 @@ async function main() {
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
+      availableColors: ["Black", "White", "Blue"],
+      availableInteriorColors: ["Black", "Beige"],
     },
-    // used vehicles, with mileage and history records added further down
     {
       brand: "Tesla",
       model: "Model S",
@@ -174,6 +187,8 @@ async function main() {
       isHotDeal: false,
       condition: "USED",
       mileage: 42000,
+      availableColors: ["Blue"],
+      availableInteriorColors: ["Black"],
     },
     {
       brand: "Nissan",
@@ -188,6 +203,8 @@ async function main() {
       isHotDeal: false,
       condition: "USED",
       mileage: 58000,
+      availableColors: ["White"],
+      availableInteriorColors: ["Gray"],
     },
   ];
 
@@ -241,14 +258,23 @@ async function main() {
 
   console.log("Created vehicle history records for used vehicles");
 
-  // Cart
   const aliceCart = await prisma.cart.create({
     data: {
       userId: alice.id,
       items: {
         create: [
-          { vehicleId: vehicles[0].id, quantity: 1 },
-          { vehicleId: vehicles[3].id, quantity: 2 },
+          {
+            vehicleId: vehicles[0].id,
+            quantity: 1,
+            selectedColor: vehicles[0].availableColors[0],
+            selectedInteriorColor: vehicles[0].availableInteriorColors[0],
+          },
+          {
+            vehicleId: vehicles[3].id,
+            quantity: 2,
+            selectedColor: vehicles[3].availableColors[1],
+            selectedInteriorColor: vehicles[3].availableInteriorColors[0],
+          },
         ],
       },
     },
@@ -304,6 +330,8 @@ async function main() {
             vehicleId: vehicles[4].id,
             quantity: 1,
             priceAtPurchase: vehicles[4].price,
+            selectedColor: vehicles[4].availableColors[0],
+            selectedInteriorColor: vehicles[4].availableInteriorColors[0],
           },
         ],
       },
