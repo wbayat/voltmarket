@@ -8,6 +8,7 @@ import authRoutes from "./routes/auth.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import wishlistRoutes from "./routes/wishlist.routes.js";
 import loanCalculatorRoutes from "./routes/loanCalculator.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 
 const app = express();
 
@@ -22,5 +23,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/loan-calculator", loanCalculatorRoutes);
+app.use("/api/cart", cartRoutes);
 
 export default app;
