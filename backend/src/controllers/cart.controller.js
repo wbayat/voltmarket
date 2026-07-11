@@ -13,6 +13,21 @@ const getOrCreateCart = async (userId) => {
   return cart;
 };
 
+// checks that the selected color and interior color exist
+const validateSelectedOptions = (
+  vehicle,
+  selectedColor,
+  selectedInteriorColor,
+) => {
+  if (!vehicle.availableColors.includes(selectedColor)) {
+    return `"${selectedColor}" is not an available color for this vehicle`;
+  }
+  if (!vehicle.availableInteriorColors.includes(selectedInteriorColor)) {
+    return `"${selectedInteriorColor}" is not an available interior color for this vehicle`;
+  }
+  return null;
+};
+
 // controller to add a vehicle to cart.
 export const addToCart = async (req, res) => {
   try {
@@ -24,7 +39,8 @@ export const addToCart = async (req, res) => {
         .json({ message: "Invalid input", errors: result.error.errors });
     }
 
-    const { vehicleId, quantity } = result.data;
+    const { vehicleId, quantity, selectedColor, selectedInteriorColor } =
+      result.data;
 
     // find vehicel to make sure it's a valid one
     const vehicle = await prisma.vehicle.findUnique({
@@ -39,15 +55,24 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ message: "Not enough stock available" });
     }
 
+    // chosen color/interior must be one of the vehicle's actual options
+    const optionError = validateSelectedOptions(
+      vehicle,
+      selectedColor,
+      selectedInteriorColor,
+    );
+    if (optionError) {
+      return res.status(400).json({ message: optionError });
+    }
+
     const cart = await getOrCreateCart(req.userId);
 
-    // if the vehicle is already in the cart, increase the quantity instead of duplicating the row
-    const existingItem = await prisma.cartItem.findUnique({
+    const existingItem = await prisma.cartItem.findFirst({
       where: {
-        cartId_vehicleId: {
-          cartId: cart.id,
-          vehicleId,
-        },
+        cartId: cart.id,
+        vehicleId,
+        selectedColor,
+        selectedInteriorColor,
       },
     });
 
@@ -59,7 +84,13 @@ export const addToCart = async (req, res) => {
       });
     } else {
       cartItem = await prisma.cartItem.create({
-        data: { cartId: cart.id, vehicleId, quantity },
+        data: {
+          cartId: cart.id,
+          vehicleId,
+          quantity,
+          selectedColor,
+          selectedInteriorColor,
+        },
       });
     }
 
@@ -89,7 +120,7 @@ export const getCart = async (req, res) => {
   }
 };
 
-// controller to update quantity of an item in the cart
+// controller to update quantity, color, or interior color of an item in the cart
 export const updateCartItem = async (req, res) => {
   try {
     const { itemId } = req.params;
@@ -101,7 +132,15 @@ export const updateCartItem = async (req, res) => {
         .json({ message: "Invalid input", errors: result.error.errors });
     }
 
-    const { quantity } = result.data;
+    const { quantity, selectedColor, selectedInteriorColor } = result.data;
+
+    if (
+      quantity === undefined &&
+      selectedColor === undefined &&
+      selectedInteriorColor === undefined
+    ) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
 
     const cartItem = await prisma.cartItem.findUnique({
       where: { id: parseInt(itemId) },
@@ -112,13 +151,32 @@ export const updateCartItem = async (req, res) => {
       return res.status(404).json({ message: "Cart item not found" });
     }
 
-    if (cartItem.vehicle.quantity < quantity) {
+    if (quantity !== undefined && cartItem.vehicle.quantity < quantity) {
       return res.status(400).json({ message: "Not enough stock available" });
+    }
+
+    const nextColor = selectedColor ?? cartItem.selectedColor;
+    const nextInteriorColor =
+      selectedInteriorColor ?? cartItem.selectedInteriorColor;
+
+    if (selectedColor !== undefined || selectedInteriorColor !== undefined) {
+      const optionError = validateSelectedOptions(
+        cartItem.vehicle,
+        nextColor,
+        nextInteriorColor,
+      );
+      if (optionError) {
+        return res.status(400).json({ message: optionError });
+      }
     }
 
     const updated = await prisma.cartItem.update({
       where: { id: cartItem.id },
-      data: { quantity },
+      data: {
+        ...(quantity !== undefined && { quantity }),
+        ...(selectedColor !== undefined && { selectedColor }),
+        ...(selectedInteriorColor !== undefined && { selectedInteriorColor }),
+      },
     });
 
     res.json({ message: "Cart item updated", cartItem: updated });
