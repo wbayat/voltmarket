@@ -273,3 +273,28 @@ curl -b cookies.txt http://localhost:5000/api/checkout/orders
 ```bash
 curl -b cookies.txt http://localhost:5000/api/checkout/orders/1
 ```
+
+# Usage Analytics
+
+## Try without being logged in (fail with 401)
+
+curl -i http://localhost:5000/api/analytics/usage
+
+## Log in as customer
+
+curl -c customer-cookies.txt -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "alice@example.com", "password": "password123"}'
+
+## Try as customer (fail with 403)
+
+curl -i -b customer-cookies.txt http://localhost:5000/api/analytics/usage
+
+## Log in as admin
+
+curl -c admin-cookies.txt -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@voltmart.com", "password": "password123"}'
+
+## Get usage analytics as admin (returns 200)
+curl -i -b admin-cookies.txt http://localhost:5000/api/analytics/usage
