@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16
-    container_name: voltmart-postgres
+    container_name: voltmarket-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: voltmart_db
+      POSTGRES_DB: voltmarket_db
       POSTGRES_USER: devuser
       POSTGRES_PASSWORD: devpass
     ports:
       - "5432:5432"
     volumes:
-      - voltmart_pgdata:/var/lib/postgresql/data
+      - voltmarket_pgdata:/var/lib/postgresql/data
 
 volumes:
-  voltmart_pgdata:
+  voltmarket_pgdata:
