@@ -16,6 +16,8 @@ const app = express();
 
 // TODO: fix cors later
 
+app.use(express.static("public"));
+
 app.use(express.json());
 app.use(cookieParser());
 
