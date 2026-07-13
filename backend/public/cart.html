@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Cart</title>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="vehicles.html">Browse Vehicles</a> |
+      <a href="checkout.html">Checkout</a>
+    </nav>
+
+    <hr />
+
+    <h1>Your Cart</h1>
+
+    <div id="cartItems">Loading cart...</div>
+
+    <script>
+      async function loadCart() {
+        const response = await fetch("/api/cart");
+        const cart = await response.json();
+
+        const cartDiv = document.getElementById("cartItems");
+        cartDiv.innerHTML = "";
+
+        if (!cart.items || cart.items.length === 0) {
+          cartDiv.textContent = "Your cart is empty.";
+          return;
+        }
+
+        cart.items.forEach(function (item) {
+          const div = document.createElement("div");
+          div.innerHTML =
+            "<strong>" +
+            item.vehicle.brand +
+            " " +
+            item.vehicle.model +
+            "</strong><br>" +
+            "Color: " +
+            item.selectedColor +
+            " | Interior: " +
+            item.selectedInteriorColor +
+            "<br>" +
+            "Price: $" +
+            item.vehicle.price +
+            " each<br>" +
+            "Quantity: <input type='number' min='1' max='10' value='" +
+            item.quantity +
+            "' id='qty-" +
+            item.id +
+            "'>" +
+            " <button onclick='updateQuantity(" +
+            item.id +
+            ")'>Update Quantity</button><br>" +
+            "<button onclick='removeItem(" +
+            item.id +
+            ")'>Remove</button>" +
+            "<hr>";
+          cartDiv.appendChild(div);
+        });
+      }
+
+      async function updateQuantity(itemId) {
+        const quantity = parseInt(
+          document.getElementById("qty-" + itemId).value,
+        );
+
+        const response = await fetch("/api/cart/" + itemId, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ quantity }),
+        });
+
+        const data = await response.json();
+        alert(response.ok ? data.message : "Error: " + data.message);
+        loadCart();
+      }
+
+      async function removeItem(itemId) {
+        const response = await fetch("/api/cart/" + itemId, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+        alert(response.ok ? data.message : "Error: " + data.message);
+        loadCart();
+      }
+
+      loadCart();
+    </script>
+  </body>
+</html>
