@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hot Deals</title>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="vehicles.html">Browse Vehicles</a>
+    </nav>
+
+    <hr />
+
+    <h1>voltmart</h1>
+    <h1>Hot Deals</h1>
+
+    <div id="results">Loading hot deals...</div>
+
+    <script>
+      async function loadHotDeals() {
+        const response = await fetch("/api/vehicles/hot-deals");
+        const vehicles = await response.json();
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+
+        if (vehicles.length === 0) {
+          resultsDiv.textContent = "No hot deals right now.";
+          return;
+        }
+
+        vehicles.forEach(function (vehicle) {
+          const item = document.createElement("div");
+          item.innerHTML =
+            "<strong>" +
+            vehicle.brand +
+            " " +
+            vehicle.model +
+            "</strong> (" +
+            vehicle.year +
+            ")<br>" +
+            "Price: $" +
+            vehicle.price +
+            "<br>" +
+            "<a href='vehicle-details.html?id=" +
+            vehicle.id +
+            "'>View details</a>" +
+            "<hr>";
+          resultsDiv.appendChild(item);
+        });
+      }
+
+      loadHotDeals();
+    </script>
+  </body>
+</html>
