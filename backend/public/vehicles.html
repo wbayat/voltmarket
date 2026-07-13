@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Browse Vehicles</title>
+  </head>
+  <body>
+    <h1>voltmarket</h1>
+    <h1>Browse Vehicles</h1>
+
+    <!-- This form is used to filter vehicles based on brand or condition -->
+    <form id="filterForm">
+      <label>Brand:</label>
+      <input type="text" id="brand" /><br /><br />
+
+      <label>Condition:</label>
+      <select id="condition">
+        <option value="">Any</option>
+        <option value="NEW">New</option>
+        <option value="USED">Used</option></select
+      ><br /><br />
+
+      <button type="submit">Filter</button>
+    </form>
+
+    <hr />
+
+    <!-- All of the vehicles will appaer in this div -->
+    <div id="results">Loading vehicles...</div>
+
+    <script>
+      async function loadVehicles(queryString) {
+        const url = "/api/vehicles" + (queryString ? "?" + queryString : "");
+        const response = await fetch(url);
+        const vehicles = await response.json();
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+
+        if (vehicles.length === 0) {
+          resultsDiv.textContent = "No vehicles found.";
+          return;
+        }
+
+        vehicles.forEach(function (vehicle) {
+          const item = document.createElement("div");
+          item.innerHTML =
+            "<strong>" +
+            vehicle.brand +
+            " " +
+            vehicle.model +
+            "</strong> (" +
+            vehicle.year +
+            ")<br>" +
+            "Price: $" +
+            vehicle.price +
+            "<br>" +
+            "Condition: " +
+            vehicle.condition +
+            "<br>" +
+            "Range: " +
+            vehicle.range +
+            " km<br>" +
+            "<a href='vehicle-details.html?id=" +
+            vehicle.id +
+            "'>View details</a>" +
+            "<hr>";
+          resultsDiv.appendChild(item);
+        });
+      }
+
+      document
+        .getElementById("filterForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const brand = document.getElementById("brand").value;
+          const condition = document.getElementById("condition").value;
+
+          const params = new URLSearchParams();
+          if (brand) params.append("brand", brand);
+          if (condition) params.append("condition", condition);
+
+          loadVehicles(params.toString());
+        });
+
+      loadVehicles("");
+    </script>
+  </body>
+</html>

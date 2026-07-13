@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a> | <a href="register.html">Register</a> |
+      <a href="login.html">Login</a> |
+      <a href="vehicles.html">Browse Vehicles</a>
+    </nav>
+
+    <hr />
+
+    <h1>Voltmarket</h1>
+    <h1>Login</h1>
+
+    <form id="loginForm">
+      <label>Email:</label><br />
+      <input type="email" id="email" required /><br /><br />
+
+      <label>Password:</label><br />
+      <input type="password" id="password" required /><br /><br />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              document.getElementById("message").textContent =
+                "Logged in as " + data.user.name;
+            } else {
+              document.getElementById("message").textContent =
+                "Error: " + data.message;
+            }
+          } catch (error) {
+            document.getElementById("message").textContent =
+              "Something went wrong: " + error.message;
+          }
+        });
+    </script>
+  </body>
+</html>

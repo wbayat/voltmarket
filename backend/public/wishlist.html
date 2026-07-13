@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Wishlist</title>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="vehicles.html">Browse Vehicles</a>
+    </nav>
+
+    <hr />
+
+    <h1>voltmarket</h1>
+    <h1>Your Wishlist</h1>
+
+    <!-- All of the items will be rendered inside this dib -->
+    <div id="wishlistItems">Loading wishlist...</div>
+
+    <script>
+      async function loadWishlist() {
+        const response = await fetch("/api/wishlist");
+        const wishlist = await response.json();
+
+        const wishlistDiv = document.getElementById("wishlistItems");
+        wishlistDiv.innerHTML = "";
+
+        if (wishlist.length === 0) {
+          wishlistDiv.textContent = "Your wishlist is empty.";
+          return;
+        }
+
+        wishlist.forEach(function (item) {
+          const div = document.createElement("div");
+          div.innerHTML =
+            "<strong>" +
+            item.vehicle.brand +
+            " " +
+            item.vehicle.model +
+            "</strong><br>" +
+            "Price: $" +
+            item.vehicle.price +
+            "<br>" +
+            "<a href='vehicle-details.html?id=" +
+            item.vehicle.id +
+            "'>View details</a> " +
+            "<button onclick='removeItem(" +
+            item.vehicle.id +
+            ")'>Remove</button>" +
+            "<hr>";
+          wishlistDiv.appendChild(div);
+        });
+      }
+
+      async function removeItem(vehicleId) {
+        const response = await fetch("/api/wishlist/" + vehicleId, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+        alert(response.ok ? data.message : "Error: " + data.message);
+        loadWishlist();
+      }
+
+      loadWishlist();
+    </script>
+  </body>
+</html>

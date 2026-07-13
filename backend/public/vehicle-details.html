@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Vehicle Details</title>
+  </head>
+  <body>
+    <nav>
+      <a href="index.html">Home</a> |
+      <a href="vehicles.html">Browse Vehicles</a> |
+      <a href="cart.html">Cart</a>
+    </nav>
+
+    <hr />
+
+    <h1>voltmarket</h1>
+    <h1>Vehicle Details</h1>
+
+    <div id="vehicleInfo">Loading...</div>
+
+    <hr />
+
+    <h2>Add to Cart</h2>
+    <form id="cartForm">
+      <label>Color:</label>
+      <select id="selectedColor"></select
+      ><br /><br />
+
+      <label>Interior Color:</label>
+      <select id="selectedInteriorColor"></select
+      ><br /><br />
+
+      <label>Quantity:</label>
+      <input
+        type="number"
+        id="quantity"
+        value="1"
+        min="1"
+        max="10"
+      /><br /><br />
+
+      <button type="submit">Add to Cart</button>
+    </form>
+    <p id="cartMessage"></p>
+
+    <button id="wishlistBtn">Add to Wishlist</button>
+    <p id="wishlistMessage"></p>
+
+    <hr />
+
+    <h2>Vehicle History</h2>
+    <div id="historyInfo"></div>
+
+    <hr />
+
+    <h2>Reviews</h2>
+    <div id="reviewsInfo">Loading reviews...</div>
+
+    <h3>Write a Review</h3>
+    <form id="reviewForm">
+      <label>Rating (1-5):</label>
+      <input type="number" id="rating" min="1" max="5" required /><br /><br />
+
+      <label>Comment:</label><br />
+      <textarea id="comment"></textarea><br /><br />
+
+      <button type="submit">Submit Review</button>
+    </form>
+    <p id="reviewMessage"></p>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const vehicleId = params.get("id");
+      let currentVehicle = null;
+
+      async function loadVehicle() {
+        const response = await fetch("/api/vehicles/" + vehicleId);
+        const vehicle = await response.json();
+
+        if (!response.ok) {
+          document.getElementById("vehicleInfo").textContent =
+            "Vehicle not found.";
+          return;
+        }
+
+        currentVehicle = vehicle;
+
+        document.getElementById("vehicleInfo").innerHTML =
+          "<strong>" +
+          vehicle.brand +
+          " " +
+          vehicle.model +
+          "</strong> (" +
+          vehicle.year +
+          ")<br>" +
+          "Price: $" +
+          vehicle.price +
+          "<br>" +
+          "Condition: " +
+          vehicle.condition +
+          "<br>" +
+          (vehicle.mileage ? "Mileage: " + vehicle.mileage + " km<br>" : "") +
+          "Range: " +
+          vehicle.range +
+          " km<br>" +
+          "Description: " +
+          (vehicle.description || "N/A") +
+          "<br>" +
+          "In Stock: " +
+          vehicle.quantity;
+
+        const colorSelect = document.getElementById("selectedColor");
+        vehicle.availableColors.forEach(function (color) {
+          const option = document.createElement("option");
+          option.value = color;
+          option.textContent = color;
+          colorSelect.appendChild(option);
+        });
+
+        const interiorSelect = document.getElementById("selectedInteriorColor");
+        vehicle.availableInteriorColors.forEach(function (color) {
+          const option = document.createElement("option");
+          option.value = color;
+          option.textContent = color;
+          interiorSelect.appendChild(option);
+        });
+
+        const historyDiv = document.getElementById("historyInfo");
+        if (!vehicle.historyRecords || vehicle.historyRecords.length === 0) {
+          historyDiv.textContent = "No history records.";
+        } else {
+          historyDiv.innerHTML = "";
+          vehicle.historyRecords.forEach(function (record) {
+            const item = document.createElement("div");
+            const date = new Date(record.eventDate).toLocaleDateString();
+            item.innerHTML =
+              "<strong>" +
+              record.eventType +
+              "</strong> (" +
+              date +
+              "): " +
+              record.description;
+            historyDiv.appendChild(item);
+          });
+        }
+      }
+
+      document
+        .getElementById("cartForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const quantity = parseInt(document.getElementById("quantity").value);
+          const selectedColor = document.getElementById("selectedColor").value;
+          const selectedInteriorColor = document.getElementById(
+            "selectedInteriorColor",
+          ).value;
+
+          const response = await fetch("/api/cart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              vehicleId: parseInt(vehicleId),
+              quantity,
+              selectedColor,
+              selectedInteriorColor,
+            }),
+          });
+
+          const data = await response.json();
+          document.getElementById("cartMessage").textContent = response.ok
+            ? data.message
+            : "Error: " + data.message;
+        });
+
+      document
+        .getElementById("wishlistBtn")
+        .addEventListener("click", async function () {
+          const response = await fetch("/api/wishlist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ vehicleId: parseInt(vehicleId) }),
+          });
+
+          const data = await response.json();
+          document.getElementById("wishlistMessage").textContent = response.ok
+            ? data.message
+            : "Error: " + data.message;
+        });
+
+      async function loadReviews() {
+        const response = await fetch("/api/reviews/vehicle/" + vehicleId);
+        const reviews = await response.json();
+
+        const reviewsDiv = document.getElementById("reviewsInfo");
+        reviewsDiv.innerHTML = "";
+
+        if (reviews.length === 0) {
+          reviewsDiv.textContent = "No reviews yet.";
+          return;
+        }
+
+        reviews.forEach(function (review) {
+          const item = document.createElement("div");
+          item.innerHTML =
+            "<strong>" +
+            review.user.name +
+            "</strong> - Rating: " +
+            review.rating +
+            "/5<br>" +
+            (review.comment || "");
+          reviewsDiv.appendChild(item);
+        });
+      }
+
+      document
+        .getElementById("reviewForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const rating = parseInt(document.getElementById("rating").value);
+          const comment = document.getElementById("comment").value;
+
+          const response = await fetch("/api/reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              vehicleId: parseInt(vehicleId),
+              rating,
+              comment,
+            }),
+          });
+
+          const data = await response.json();
+          document.getElementById("reviewMessage").textContent = response.ok
+            ? data.message
+            : "Error: " + data.message;
+
+          if (response.ok) {
+            loadReviews();
+          }
+        });
+
+      loadVehicle();
+      loadReviews();
+    </script>
+  </body>
+</html>
