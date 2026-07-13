@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <title>VoltMart - Home</title>
+  </head>
+  <body>
+    <h1>Voltmart</h1>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="register.html">Register</a>
+      <a href="login.html">Login</a>
+      <a href="vehicles.html">Browse Vehicles</a>
+      <a href="hot-deals.html">Hot Deals</a>
+      <a href="cart.html">Cart</a>
+      <a href="wishlist.html">Wishlist</a>
+      <a href="orders.html">My Orders</a>
+      <button id="logoutBtn">Logout</button>
+    </nav>
+
+    <hr />
+
+    <p>
+      Welcome to VoltMart. These are some simple web pages with no CSS. Use the
+      links above to test each feature.
+    </p>
+
+    <script>
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", async function () {
+          const response = await fetch("/api/auth/logout", { method: "POST" });
+          const data = await response.json();
+          alert(data.message);
+        });
+    </script>
+  </body>
+</html>
