@@ -152,6 +152,12 @@ curl -b cookies.txt -X POST http://localhost:5000/api/reviews \
 curl http://localhost:5000/api/reviews/vehicle/17
 ```
 
+## Get average rating for a vehicle
+
+```bash
+curl http://localhost:5000/api/reviews/vehicle/1/average
+```
+
 # Wishlist
 
 ## Add a vehicle to wishlist
@@ -278,23 +284,44 @@ curl -b cookies.txt http://localhost:5000/api/checkout/orders/1
 
 ## Try without being logged in (fail with 401)
 
+```bash
 curl -i http://localhost:5000/api/analytics/usage
+```
 
 ## Log in as customer
 
+```bash
 curl -c customer-cookies.txt -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "alice@example.com", "password": "password123"}'
+```
 
 ## Try as customer (fail with 403)
 
+```bash
 curl -i -b customer-cookies.txt http://localhost:5000/api/analytics/usage
+```
 
 ## Log in as admin
 
+```bash
 curl -c admin-cookies.txt -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@voltmarket.com", "password": "password123"}'
+ -H "Content-Type: application/json" \
+ -d '{"email": "admin@voltmarket.com", "password": "password123"}'
+```
 
 ## Get usage analytics as admin (returns 200)
+
+```bash
 curl -i -b admin-cookies.txt http://localhost:5000/api/analytics/usage
+```
+
+# Chatbot
+
+## Send a message to chatbot
+
+```bash
+curl -X POST http://localhost:5000/api/chatbot \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What should I look for when buying a used EV?"}'
+```
