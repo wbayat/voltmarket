@@ -11,6 +11,7 @@ import loanCalculatorRoutes from "./routes/loanCalculator.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import checkoutRoutes from "./routes/checkout.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import chatbotRoutes from "./routes/chatbot.routes.js";
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/loan-calculator", loanCalculatorRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 export default app;
