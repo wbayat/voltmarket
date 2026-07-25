@@ -64,3 +64,34 @@ export const getReviewsForVehicle = async (req, res) => {
     res.status(500).json({ message: "Something went wrong fetching reviews" });
   }
 };
+
+// controller to get the average rating and review count for a vehicle.
+export const getAverageRating = async (req, res) => {
+  try {
+    const { vehicleId } = req.params;
+
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id: parseInt(vehicleId) },
+    });
+    if (!vehicle) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+
+    const result = await prisma.review.aggregate({
+      where: { vehicleId: parseInt(vehicleId) },
+      _avg: { rating: true },
+      _count: { rating: true },
+    });
+
+    res.json({
+      vehicleId: parseInt(vehicleId),
+      averageRating: result._avg.rating, // null if there are no reviews yet
+      reviewCount: result._count.rating,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Something went wrong calculating the average rating" });
+  }
+};
