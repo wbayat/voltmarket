@@ -31,6 +31,7 @@ Paste the output into `JWT_SECRET` in your `.env`.
 
 ```bash
 npx prisma migrate dev
+npx prisma generate
 ```
 
 This creates all tables in your local Postgres database
@@ -47,3 +48,26 @@ Server runs at `http://localhost:5000` by default.
 
 Run `node prisma/seed.js` to add dummy values into the db for testing.
 Or use `npx prisma studio`.
+
+### 6. Set up the frontend
+
+Open a new terminal, keeping the backend running.
+
+```bash
+cd frontend
+npm install
+```
+
+create a `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+### 7. Start the frontend
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser.
