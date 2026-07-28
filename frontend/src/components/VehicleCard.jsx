@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../api/client";
 
-const VehicleCard = ({ vehicle }) => {
+const VehicleCard = ({ vehicle, wishlisted, onToggleWishlist }) => {
   const [rating, setRating] = useState(null);
-  const [wishlisted, setWishlisted] = useState(false);
   const [wishlistError, setWishlistError] = useState("");
 
   useEffect(() => {
@@ -13,16 +12,12 @@ const VehicleCard = ({ vehicle }) => {
       .catch(() => setRating(null));
   }, [vehicle.id]);
 
-  const handleWishlist = async (e) => {
+  const handleWishlistClick = async (e) => {
     e.preventDefault(); // don't follow the card link
     setWishlistError("");
 
     try {
-      await apiRequest("/wishlist", {
-        method: "POST",
-        body: JSON.stringify({ vehicleId: vehicle.id }),
-      });
-      setWishlisted(true);
+      await onToggleWishlist(vehicle.id, wishlisted);
     } catch (err) {
       setWishlistError(err.message);
     }
@@ -44,8 +39,8 @@ const VehicleCard = ({ vehicle }) => {
         )}
 
         <button
-          onClick={handleWishlist}
-          title="Add to wishlist"
+          onClick={handleWishlistClick}
+          title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className="group absolute top-2 right-2 w-9 h-9 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center hover:bg-white/90 transition-colors"
         >
           <span

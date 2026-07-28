@@ -28,6 +28,8 @@ const VehicleList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [wishlistIds, setWishlistIds] = useState(new Set());
+
   const [selectedBrands, setSelectedBrands] = useState(new Set());
   const [selectedColors, setSelectedColors] = useState(new Set());
   const [selectedConditions, setSelectedConditions] = useState(
@@ -41,7 +43,31 @@ const VehicleList = () => {
       .then((data) => setVehicles(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+
+    // if the user isn't logged in, this fails
+    apiRequest("/wishlist")
+      .then((data) =>
+        setWishlistIds(new Set(data.map((item) => item.vehicle.id))),
+      )
+      .catch(() => setWishlistIds(new Set()));
   }, []);
+
+  const handleToggleWishlist = async (vehicleId, isCurrentlyWishlisted) => {
+    if (isCurrentlyWishlisted) {
+      await apiRequest(`/wishlist/${vehicleId}`, { method: "DELETE" });
+      setWishlistIds((prev) => {
+        const next = new Set(prev);
+        next.delete(vehicleId);
+        return next;
+      });
+    } else {
+      await apiRequest("/wishlist", {
+        method: "POST",
+        body: JSON.stringify({ vehicleId }),
+      });
+      setWishlistIds((prev) => new Set(prev).add(vehicleId));
+    }
+  };
 
   const brands = useMemo(
     () => [...new Set(vehicles.map((v) => v.brand))].sort(),
@@ -185,7 +211,7 @@ const VehicleList = () => {
               active={hotDealsOnly}
               onClick={() => setHotDealsOnly(!hotDealsOnly)}
             >
-              Hot Deals
+              Hot Deals Only
             </ToggleButton>
           </div>
         </aside>
@@ -204,7 +230,12 @@ const VehicleList = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedVehicles.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                wishlisted={wishlistIds.has(vehicle.id)}
+                onToggleWishlist={handleToggleWishlist}
+              />
             ))}
           </div>
         </div>
