@@ -44,7 +44,7 @@ const VehicleDetails = () => {
   const [reviews, setReviews] = useState([]);
 
   const [wishlisted, setWishlisted] = useState(false);
-  const [wishlistMessage, setWishlistMessage] = useState("");
+  const [wishlistError, setWishlistError] = useState("");
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedInteriorColor, setSelectedInteriorColor] = useState("");
@@ -77,21 +77,42 @@ const VehicleDetails = () => {
       .catch(() => setRating(null));
   };
 
+  // Checks whether this item is already in the user's wishlist
+  // If an item is in the wishlist, this button will remove it
+  // If the item is not in the wishlist, it add it
+  const loadWishlistStatus = () => {
+    apiRequest("/wishlist")
+      .then((data) => {
+        const alreadyWishlisted = data.some(
+          (item) => item.vehicle.id === parseInt(id),
+        );
+        setWishlisted(alreadyWishlisted);
+      })
+      .catch(() => setWishlisted(false));
+  };
+
   useEffect(() => {
     loadVehicle();
     loadReviews();
+    loadWishlistStatus();
   }, [id]);
 
-  const handleWishlist = async () => {
-    setWishlistMessage("");
+  const handleWishlistToggle = async () => {
+    setWishlistError("");
+
     try {
-      await apiRequest("/wishlist", {
-        method: "POST",
-        body: JSON.stringify({ vehicleId: parseInt(id) }),
-      });
-      setWishlisted(true);
+      if (wishlisted) {
+        await apiRequest(`/wishlist/${id}`, { method: "DELETE" });
+        setWishlisted(false);
+      } else {
+        await apiRequest("/wishlist", {
+          method: "POST",
+          body: JSON.stringify({ vehicleId: parseInt(id) }),
+        });
+        setWishlisted(true);
+      }
     } catch (err) {
-      setWishlistMessage(err.message);
+      setWishlistError(err.message);
     }
   };
 
@@ -161,8 +182,8 @@ const VehicleDetails = () => {
         )}
 
         <button
-          onClick={handleWishlist}
-          title="Add to wishlist"
+          onClick={handleWishlistToggle}
+          title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           className="group absolute top-3 right-3 w-11 h-11 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center hover:bg-white/90 transition-colors"
         >
           <span
@@ -211,8 +232,8 @@ const VehicleDetails = () => {
               ? `${vehicle.quantity} in stock`
               : "Out of stock"}
           </span>
-          {wishlistMessage && (
-            <p className="text-xs text-red-600 mt-1">{wishlistMessage}</p>
+          {wishlistError && (
+            <p className="text-xs text-red-600 mt-1">{wishlistError}</p>
           )}
         </div>
 
