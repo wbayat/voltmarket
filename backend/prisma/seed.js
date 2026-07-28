@@ -62,7 +62,10 @@ async function main() {
       range: 358,
       color: "White",
       quantity: 12,
-      imageUrls: [],
+      imageUrls: [
+        "https://www.motorbiscuit.com/wp-content/uploads/2022/06/2023-tesla-model-3-white-shot.jpg",
+        "https://www.motorbiscuit.com/wp-content/uploads/2022/06/2023-tesla-model-3-white-charging.jpg",
+      ],
       description: "An electric sedan.",
       isHotDeal: true,
       condition: "NEW",
