@@ -1,10 +1,21 @@
 import OpenAI from "openai";
 
 // We used a free gpt-4o-mini model for the chatbot feature
-const client = new OpenAI({
-  baseURL: "https://models.inference.ai.azure.com",
-  apiKey: process.env.GITHUB_TOKEN,
-});
+// built lazily so a missing GITHUB_TOKEN only fails chatbot requests,
+// instead of crashing the whole server at import time
+let client;
+const getClient = () => {
+  if (!client) {
+    if (!process.env.GITHUB_TOKEN) {
+      throw new Error("GITHUB_TOKEN is not configured");
+    }
+    client = new OpenAI({
+      baseURL: "https://models.inference.ai.azure.com",
+      apiKey: process.env.GITHUB_TOKEN,
+    });
+  }
+  return client;
+};
 
 const MODEL = "gpt-4o-mini";
 
@@ -23,7 +34,7 @@ export const getChatbotReply = async (message, history = []) => {
     { role: "user", content: message },
   ];
 
-  const response = await client.chat.completions.create({
+  const response = await getClient().chat.completions.create({
     model: MODEL,
     messages,
     temperature: 0.7,
