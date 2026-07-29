@@ -1,5 +1,8 @@
 import express from "express";
-import { getUsageAnalytics } from "../controllers/analytics.controller.js";
+import {
+  getUsageAnalytics,
+  getSalesAnalytics,
+} from "../controllers/analytics.controller.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -9,5 +12,6 @@ router.use(requireAuth);
 router.use(requireAdmin);
 
 router.get("/usage", getUsageAnalytics);
+router.get("/sales", getSalesAnalytics);
 
 export default router;
