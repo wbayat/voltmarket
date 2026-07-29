@@ -7,8 +7,10 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const cookieOptions = {
   httpOnly: true, // This is to protect against XSS attacks
-  secure: isProduction, // only sent over HTTPS in production but not in deployment
-  sameSite: "lax", //  CSRF protection
+  secure: isProduction, // sent only over HTTPS in production; allowed over HTTP locally
+  // frontend and backend are deployed on different domains, so the cookie
+  // must be SameSite=None to be sent on cross-origin requests
+  sameSite: isProduction ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
