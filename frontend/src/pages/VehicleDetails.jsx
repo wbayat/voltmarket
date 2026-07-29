@@ -1,7 +1,7 @@
 // Details + History + Reviews + Add to Cart/
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { apiRequest } from "../api/client";
 
 const ColorSwatch = ({ color, selected, onClick }) => (
@@ -280,6 +280,14 @@ const VehicleDetails = () => {
             >
               Add to Cart
             </button>
+
+            <Link
+              to={`/loan-calculator?vehicleId=${vehicle.id}`}
+              className="border border-black rounded-lg py-2 text-sm text-center hover:bg-gray-100"
+            >
+              {" "}
+              Estimate financing{" "}
+            </Link>
           </div>
         </div>
       </div>
