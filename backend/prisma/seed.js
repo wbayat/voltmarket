@@ -21,6 +21,25 @@ async function main() {
   await prisma.vehicle.deleteMany();
   await prisma.user.deleteMany();
 
+  // deleteMany() doesn't reset Postgres's auto-increment sequences, so
+  // without this, every reseed run would start ids higher than the last
+  const tablesWithAutoincrementIds = [
+    "VehicleHistoryRecord",
+    "Review",
+    "WishlistItem",
+    "OrderItem",
+    "Order",
+    "CartItem",
+    "Cart",
+    "Vehicle",
+    "User",
+  ];
+  for (const table of tablesWithAutoincrementIds) {
+    await prisma.$executeRawUnsafe(
+      `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), 1, false);`,
+    );
+  }
+
   // Users
   const hashedPassword = await bcrypt.hash("password123", 10);
 
@@ -80,7 +99,9 @@ async function main() {
       range: 330,
       color: "Black",
       quantity: 8,
-      imageUrls: [],
+      imageUrls: [
+        "https://media.ed.edmunds-media.com/tesla/model-y/2024/oem/2024_tesla_model-y_4dr-suv_performance_fq_oem_1_1600.jpg",
+      ],
       description: "SUV vehicle.",
       isHotDeal: false,
       condition: "NEW",
@@ -95,7 +116,9 @@ async function main() {
       range: 300,
       color: "Red",
       quantity: 5,
-      imageUrls: [],
+      imageUrls: [
+        "https://hips.hearstapps.com/hmg-prod/images/2021-ford-mustang-mach-e-e4x-111-1625066618.jpg",
+      ],
       description: "An electric SUV.",
       isHotDeal: true,
       condition: "NEW",
@@ -110,7 +133,9 @@ async function main() {
       range: 247,
       color: "Blue",
       quantity: 15,
-      imageUrls: [],
+      imageUrls: [
+        "https://static.cargurus.com/images/forsale/2026/07/25/22/04/2023_chevrolet_bolt_euv-pic-1973908341803795777-1024x768.jpeg",
+      ],
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
@@ -125,7 +150,9 @@ async function main() {
       range: 303,
       color: "Silver",
       quantity: 10,
-      imageUrls: [],
+      imageUrls: [
+        "https://hips.hearstapps.com/mtg-prod/65a44d38bd9f880008777ef2/2024-hyundai-ioniq-5-front-view-113.jpg?w=768&width=768&q=75&format=webp",
+      ],
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
@@ -140,7 +167,9 @@ async function main() {
       range: 310,
       color: "Gray",
       quantity: 7,
-      imageUrls: [],
+      imageUrls: [
+        "https://cimg0.ibsrv.net/ibimg/hgm/1920x1080-1/100/903/kia-ev6_100903352.jpg",
+      ],
       description: "An electric car.",
       isHotDeal: true,
       condition: "NEW",
@@ -155,7 +184,9 @@ async function main() {
       range: 149,
       color: "Green",
       quantity: 20,
-      imageUrls: [],
+      imageUrls: [
+        "https://i.gaw.to/content/photos/48/60/486087-nissan-leaf-2022-une-grosse-baisse-de-prix-pour-suivre-la-bolt-ev.jpg",
+      ],
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
@@ -170,7 +201,9 @@ async function main() {
       range: 301,
       color: "Black",
       quantity: 4,
-      imageUrls: [],
+      imageUrls: [
+        "https://www.privatecollectionmotors.com/imagetag/881/25/l/Used-2024-BMW-i4-M50-Gran-Coupe-M50-1732670249.jpg",
+      ],
       description: "An electric car.",
       isHotDeal: false,
       condition: "NEW",
@@ -185,7 +218,9 @@ async function main() {
       range: 370,
       color: "Blue",
       quantity: 2,
-      imageUrls: [],
+      imageUrls: [
+        "https://i.gaw.to/vehicles/photos/40/22/402217-2020-tesla-model-s.jpg?1024x640",
+      ],
       description: "A well-maintained used Model S.",
       isHotDeal: false,
       condition: "USED",
@@ -201,7 +236,9 @@ async function main() {
       range: 130,
       color: "White",
       quantity: 3,
-      imageUrls: [],
+      imageUrls: [
+        "https://smartcdn.gprod.postmedia.digital/driving/wp-content/uploads/2019/01/2019-nissan-leaf-plus-front.jpg",
+      ],
       description: "A budget-friendly used Leaf.",
       isHotDeal: false,
       condition: "USED",
