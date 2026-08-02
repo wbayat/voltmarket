@@ -22,67 +22,69 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Navbar />
-        <Routes>
-          {/* public pages — no login required */}
-          <Route path="/" element={<VehicleList />} />
-          <Route path="/vehicles/:id" element={<VehicleDetails />} />
-          <Route path="/compare" element={<CompareVehicles />} />
-          <Route path="/loan-calculator" element={<LoanCalculator />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <div className="pb-20">
+          <Routes>
+            {/* public pages — no login required */}
+            <Route path="/" element={<VehicleList />} />
+            <Route path="/vehicles/:id" element={<VehicleDetails />} />
+            <Route path="/compare" element={<CompareVehicles />} />
+            <Route path="/loan-calculator" element={<LoanCalculator />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* protected pages — require login */}
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <Cart />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <Checkout />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <ProtectedRoute>
-                <Wishlist />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute>
-                <Orders />
-              </ProtectedRoute>
-            }
-          />
+            {/* protected pages — require login */}
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute>
+                  <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <ProtectedRoute>
+                  <Wishlist />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Orders />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* admin-only pages */}
-          <Route
-            path="/admin/sales-report"
-            element={
-              <ProtectedRoute adminOnly>
-                <AdminSalesReport />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/usage-report"
-            element={
-              <ProtectedRoute adminOnly>
-                <AdminUsageReport />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+            {/* admin-only pages */}
+            <Route
+              path="/admin/sales-report"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminSalesReport />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/usage-report"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminUsageReport />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
         <ChatbotWidget />
       </BrowserRouter>
     </AuthProvider>

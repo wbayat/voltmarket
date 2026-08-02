@@ -6,18 +6,16 @@ import OpenAI from "openai";
 let client;
 const getClient = () => {
   if (!client) {
-    if (!process.env.GITHUB_TOKEN) {
-      throw new Error("GITHUB_TOKEN is not configured");
+    if (!process.env.API_KEY) {
+      throw new Error("API_KEY is not configured");
     }
     client = new OpenAI({
-      baseURL: "https://models.inference.ai.azure.com",
-      apiKey: process.env.GITHUB_TOKEN,
+      baseURL: process.env.MODEL_ENDPOINT,
+      apiKey: process.env.API_KEY,
     });
   }
   return client;
 };
-
-const MODEL = "gpt-4o-mini";
 
 // this is the system prompt that guides the model
 // TODO: Update this later based how to navigate the website
@@ -35,10 +33,8 @@ export const getChatbotReply = async (message, history = []) => {
   ];
 
   const response = await getClient().chat.completions.create({
-    model: MODEL,
+    model: process.env.MODEL_NAME,
     messages,
-    temperature: 0.7,
-    max_tokens: 500,
   });
 
   return response.choices[0].message.content;
