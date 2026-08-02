@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { apiRequest } from "../api/client";
+import ReactMarkdown from "react-markdown";
 
 // The initial message that is shown.
 // TODO: Add user's name if logged in. Example: Hi John, ...
@@ -60,7 +61,7 @@ const ChatbotWidget = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {isOpen && (
-        <div className="w-80 h-96 bg-white border border-black rounded-2xl overflow-hidden flex flex-col shadow-xl">
+        <div className="w-80 h-110 bg-white border border-black rounded-2xl overflow-hidden flex flex-col shadow-xl">
           <div className="px-4 py-3 border-b border-black flex items-center justify-between">
             <span className="font-semibold text-black">
               VoltMarket Assistant
@@ -83,7 +84,7 @@ const ChatbotWidget = () => {
                     : "self-start bg-white border border-gray-200 text-black rounded-bl-sm"
                 }`}
               >
-                {msg.content}
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
               </div>
             ))}
             {loading && (
